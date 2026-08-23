@@ -6,7 +6,7 @@ Everything lives in one HTML file — no build step, no server, no dependencies.
 
 ## Usage
 
-1. Open `a.html` in a browser (double-click it, or serve it locally).
+1. Open `index.html` in a browser (double-click it, or serve it locally).
 2. Paste your OpenRouter API key (`sk-or-v1-...`) into the sidebar.
 3. Write a prompt and hit **Generate**.
 4. Generated images can be downloaded as PNGs.
