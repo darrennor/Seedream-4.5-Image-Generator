@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seedream 4.5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080810;
+  --surface: #0f0f1a;
+  --surface2: #161625;
+  --border: #232338;
+  --accent: #7c6fff;
+  --accent2: #ff6b9d;
+  --text: #e2e2f0;
+  --muted: #5c5c7a;
+  --glow: rgba(124,111,255,0.12);
+  --error: #f87171;
+}
+html, body { height: 100%; overflow: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; }
+
+.app {
+  display: grid;
+  grid-template-rows: 52px 1fr;
+  grid-template-columns: 370px 1fr;
+  height: 100vh;
+}
+
+/* HEADER */
+header {
+  grid-column: 1/-1;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 14px;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #7c6fff, #ff6b9d);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.logo-name { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; }
+.logo-name em { font-style: normal; background: linear-gradient(135deg, #7c6fff, #ff6b9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hsep { flex: 1; }
+.pill {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+}
+.pill-m { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+.pill-c { background: rgba(124,111,255,0.1); border: 1px solid rgba(124,111,255,0.25); color: var(--accent); }
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 18px;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.slabel {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.flabel { font-size: 12px; font-weight: 600; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
+.fsub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+
+input[type=password], input[type=text], textarea, select {
+  width: 100%;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 7px;
+  color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  padding: 8px 10px; outline: none;
+  transition: border-color .15s, box-shadow .15s; resize: none; -webkit-appearance: none;
+}
+input[type=password]:focus, input[type=text]:focus, textarea:focus, select:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow);
+}
+textarea { line-height: 1.55; }
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235c5c7a' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 26px;
+}
+
+.ex-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+.ex-btn {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--muted); font-family: 'Syne', sans-serif; font-size: 10px;
+  padding: 2px 7px; cursor: pointer; transition: color .15s, border-color .15s;
+}
+.ex-btn:hover { color: var(--text); border-color: var(--accent); }
+
+/* RATIO GRID */
+.ratio-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; }
+.rbtn {
+  padding: 6px 0; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--muted); font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; cursor: pointer; text-align: center; transition: all .15s;
+}
+.rbtn:hover { color: var(--text); border-color: var(--accent); }
+.rbtn.on { background: rgba(124,111,255,0.12); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+/* REFERENCE IMAGE UPLOAD */
+.ref-zone {
+  border: 1px dashed var(--border); border-radius: 8px;
+  padding: 14px; text-align: center; cursor: pointer;
+  transition: border-color .15s, background .15s;
+  position: relative;
+}
+.ref-zone:hover { border-color: var(--accent); background: var(--glow); }
+.ref-zone.has-img { border-style: solid; border-color: var(--accent); padding: 6px; }
+.ref-zone input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  width: 100%; height: 100%; border: none; padding: 0; background: none;
+}
+.ref-placeholder { font-size: 11px; color: var(--muted); pointer-events: none; }
+.ref-placeholder span { display: block; font-size: 20px; margin-bottom: 4px; }
+.ref-preview {
+  width: 100%; border-radius: 5px; display: block;
+  max-height: 120px; object-fit: cover; pointer-events: none;
+}
+.ref-clear {
+  position: absolute; top: 5px; right: 5px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(0,0,0,0.7); border: 1px solid var(--border);
+  color: var(--text); font-size: 10px; cursor: pointer;
+  display: none; align-items: center; justify-content: center; z-index: 2;
+  line-height: 1;
+}
+.ref-zone.has-img .ref-clear { display: flex; }
+.ref-zone.has-img .ref-placeholder { display: none; }
+
+hr.sep { border: none; border-top: 1px solid var(--border); }
+
+.err-box {
+  background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.28);
+  border-radius: 7px; padding: 9px 11px;
+  font-size: 11.5px; color: var(--error); line-height: 1.5; display: none;
+}
+.err-box.show { display: block; }
+
+.gen-btn {
+  width: 100%; padding: 12px;
+  background: linear-gradient(135deg, #7c6fff, #9b8fff);
+  border: none; border-radius: 8px; color: #fff;
+  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.3px;
+  transition: opacity .2s, transform .1s, box-shadow .2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.gen-btn:hover:not(:disabled) { opacity: 0.9; box-shadow: 0 4px 20px rgba(124,111,255,0.35); }
+.gen-btn:active:not(:disabled) { transform: scale(0.98); }
+.gen-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.gen-btn.busy { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+
+.spin {
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,0.2); border-top-color: rgba(255,255,255,0.8);
+  border-radius: 50%; animation: spin .7s linear infinite; display: none; flex-shrink: 0;
+}
+.gen-btn.busy .spin { display: block; border-color: var(--border); border-top-color: var(--accent); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.hint { text-align: center; font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+kbd { background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; font-size: 9px; }
+
+/* CANVAS */
+.canvas { display: flex; flex-direction: column; overflow: hidden; }
+.cbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  height: 42px; display: flex; align-items: center; padding: 0 22px; gap: 10px; flex-shrink: 0;
+}
+.cbar-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.cnt-badge {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--accent); background: rgba(124,111,255,0.1);
+  border: 1px solid rgba(124,111,255,0.2); border-radius: 10px; padding: 2px 8px;
+}
+.cbar-sep { flex: 1; }
+.clr-btn {
+  padding: 4px 11px; background: transparent; border: 1px solid var(--border);
+  border-radius: 6px; color: var(--muted); font-family: 'Syne', sans-serif;
+  font-size: 11px; cursor: pointer; transition: color .15s, border-color .15s; display: none;
+}
+.clr-btn.show { display: block; }
+.clr-btn:hover { color: var(--error); border-color: var(--error); }
+
+.cscroll { flex: 1; overflow-y: auto; padding: 22px; }
+.cscroll::-webkit-scrollbar { width: 4px; }
+.cscroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* EMPTY */
+.empty {
+  height: 100%; min-height: 300px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; text-align: center; padding: 40px;
+}
+.empty-icon { font-size: 42px; opacity: 0.2; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+.empty-t { font-size: 16px; font-weight: 700; color: var(--muted); }
+.empty-d { font-size: 12px; color: var(--border); line-height: 1.7; max-width: 280px; }
+.empty-d strong { color: var(--muted); }
+
+/* GRID */
+.igrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 16px; }
+
+/* CARD */
+.icard {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
+  animation: rise .35s ease both;
+}
+@keyframes rise { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+.icard:hover { border-color: rgba(124,111,255,0.45); box-shadow: 0 4px 20px rgba(124,111,255,0.1); }
+.icard img { width: 100%; display: block; aspect-ratio: 1; object-fit: contain; background: #0c0c18; }
+.cmeta { padding: 10px 12px; border-top: 1px solid var(--border); }
+.cprompt {
+  font-size: 11px; line-height: 1.5; color: var(--muted); margin-bottom: 8px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.cfoot { display: flex; align-items: center; justify-content: space-between; }
+.ctags { display: flex; gap: 4px; }
+.tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  color: var(--border); background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px;
+}
+.cactions { display: flex; gap: 4px; }
+.ibtn {
+  width: 26px; height: 26px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 5px; color: var(--muted); cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.ibtn:hover { color: var(--text); border-color: var(--accent); background: var(--glow); }
+
+/* LOADING CARD */
+.lcard {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden; animation: rise .3s ease both;
+}
+.limg {
+  aspect-ratio: 1; background: var(--surface2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; position: relative; overflow: hidden;
+}
+.limg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(124,111,255,0.04), transparent);
+  animation: sweep 1.6s ease-in-out infinite;
+}
+@keyframes sweep { from{transform:translateX(-100%)} to{transform:translateX(100%)} }
+.lspin {
+  width: 34px; height: 34px;
+  border: 2px solid rgba(124,111,255,0.15); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin .9s linear infinite; z-index: 1;
+}
+.llabel { font-size: 12px; font-weight: 600; color: var(--muted); z-index: 1; }
+.lptext {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--border);
+  z-index: 1; padding: 0 18px; text-align: center; max-width: 230px; line-height: 1.5;
+}
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--surface2); border: 1px solid var(--accent); border-radius: 7px;
+  padding: 9px 14px; font-size: 12px; color: var(--text);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.4); z-index: 1000;
+  transform: translateY(16px); opacity: 0;
+  transition: transform .22s, opacity .22s; pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* LIGHTBOX */
+.lb-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+  z-index: 2000; display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.lb-overlay.show { display: flex; }
+.lb-overlay img { max-width: 100%; max-height: 90vh; border-radius: 8px; object-fit: contain; }
+.lb-close {
+  position: absolute; top: 16px; right: 20px;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-size: 18px; width: 34px; height: 34px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: border-color .15s;
+}
+.lb-close:hover { border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🌱</div>
+      <div class="logo-name">Seedream <em>4.5</em></div>
+    </div>
+    <div class="hsep"></div>
+    <span class="pill pill-m">bytedance-seed/seedream-4.5</span>
+    <span class="pill pill-c">~£0.032 / image</span>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div>
+      <div class="slabel">Configuration</div>
+      <div class="field">
+        <div class="flabel">OpenRouter API Key <span class="fsub">sk-or-…</span></div>
+        <input type="password" id="apiKey" placeholder="sk-or-v1-..." autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    <div>
+      <div class="slabel">Prompt</div>
+      <div class="field" style="margin-bottom:10px">
+        <div class="flabel">Positive</div>
+        <textarea id="prompt" rows="5" placeholder="Describe the image…"></textarea>
+        <div class="ex-row">
+          <button class="ex-btn" onclick="loadEx(0)">Example 1</button>
+          <button class="ex-btn" onclick="loadEx(1)">Example 2</button>
+          <button class="ex-btn" onclick="loadEx(2)">Example 3</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="flabel">Negative <span class="fsub">optional</span></div>
+        <textarea id="neg" rows="2" placeholder="What to avoid…"></textarea>
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    <div>
+      <div class="slabel">Reference Image</div>
+      <div class="field">
+        <div class="flabel">Upload <span class="fsub">optional · image-to-image</span></div>
+        <div class="ref-zone" id="refZone">
+          <input type="file" id="refFile" accept="image/png,image/jpeg,image/webp,image/gif" onchange="onRefFile(event)">
+          <div class="ref-placeholder">
+            <span>🖼</span>
+            <div>Drop or click to upload</div>
+            <div style="font-size:10px;margin-top:3px;color:var(--border)">PNG · JPG · WebP · GIF</div>
+          </div>
+          <img id="refPreview" class="ref-preview" style="display:none" alt="Reference">
+          <button class="ref-clear" id="refClear" onclick="clearRef(event)" title="Remove">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    <div>
+      <div class="slabel">Settings</div>
+      <div class="field" style="margin-bottom:12px">
+        <div class="flabel">Aspect Ratio</div>
+        <div class="ratio-grid" id="ratioGrid">
+          <button class="rbtn on" data-r="1:1">1:1</button>
+          <button class="rbtn" data-r="16:9">16:9</button>
+          <button class="rbtn" data-r="9:16">9:16</button>
+          <button class="rbtn" data-r="4:3">4:3</button>
+          <button class="rbtn" data-r="3:4">3:4</button>
+          <button class="rbtn" data-r="3:2">3:2</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="flabel">Quality</div>
+        <select id="quality">
+          <option value="2K">Standard — 2K</option>
+          <option value="4K">HD — 4K</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    <div id="errBox" class="err-box"></div>
+
+    <button class="gen-btn" id="genBtn" onclick="generate()">
+      <span class="spin" id="spin"></span>
+      <span id="btnTxt">Generate Image</span>
+    </button>
+    <div class="hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to generate</div>
+
+  </aside>
+
+  <!-- CANVAS -->
+  <main class="canvas">
+    <div class="cbar">
+      <span class="cbar-label">Generated</span>
+      <span class="cnt-badge" id="cntBadge">0 images</span>
+      <div class="cbar-sep"></div>
+      <button class="clr-btn" id="clrBtn" onclick="clearAll()">Clear all</button>
+    </div>
+    <div class="cscroll" id="cscroll">
+      <div class="empty" id="emptyState">
+        <div class="empty-icon">🖼</div>
+        <div class="empty-t">Nothing generated yet</div>
+        <div class="empty-d">Enter your <strong>OpenRouter API key</strong>, write a prompt, and hit Generate. ~<strong>£0.03</strong> per image.</div>
+      </div>
+      <div class="igrid" id="igrid" style="display:none"></div>
+    </div>
+  </main>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lb-overlay" id="lb" onclick="closeLb(event)">
+  <button class="lb-close" onclick="closeLb()">✕</button>
+  <img id="lbImg" src="" alt="">
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const EXAMPLES = [
+  "Cinematic portrait of a neon-lit cyberpunk street market at night, rain-slicked cobblestones reflecting pink and teal neon signs, ultra-detailed, photorealistic, 8K",
+  "Minimalist product shot of a glass perfume bottle on white Carrara marble, soft diffused studio lighting, commercial photography, razor sharp",
+  "Fantasy cartography map of a lost archipelago, aged parchment texture, hand-drawn ink illustration, detailed coastlines, warm sepia tones"
+];
+
+let selectedRatio = "1:1";
+let refBase64 = null;  // stores "data:image/jpeg;base64,..." string
+let imgCount = 0;
+
+// ── RATIO BUTTONS ──
+document.getElementById("ratioGrid").addEventListener("click", e => {
+  if (!e.target.dataset.r) return;
+  document.querySelectorAll(".rbtn").forEach(b => b.classList.remove("on"));
+  e.target.classList.add("on");
+  selectedRatio = e.target.dataset.r;
+});
+
+// ── KEYBOARD SHORTCUT ──
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") generate();
+  if (e.key === "Escape") closeLb();
+});
+
+// ── EXAMPLES ──
+function loadEx(i) {
+  document.getElementById("prompt").value = EXAMPLES[i];
+}
+
+// ── REFERENCE IMAGE ──
+function onRefFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    refBase64 = ev.target.result; // full data URL e.g. data:image/jpeg;base64,...
+    const preview = document.getElementById("refPreview");
+    preview.src = refBase64;
+    preview.style.display = "block";
+    document.getElementById("refZone").classList.add("has-img");
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearRef(e) {
+  e.stopPropagation();
+  refBase64 = null;
+  const preview = document.getElementById("refPreview");
+  preview.src = "";
+  preview.style.display = "none";
+  document.getElementById("refZone").classList.remove("has-img");
+  document.getElementById("refFile").value = "";
+}
+
+// ── UI HELPERS ──
+function showErr(msg) {
+  const b = document.getElementById("errBox");
+  b.textContent = msg;
+  b.classList.add("show");
+}
+function hideErr() { document.getElementById("errBox").classList.remove("show"); }
+
+function setLoading(on, promptTxt) {
+  const btn = document.getElementById("genBtn");
+  const lbl = document.getElementById("btnTxt");
+  if (on) {
+    btn.disabled = true; btn.classList.add("busy");
+    lbl.textContent = "Generating…";
+    addLoadCard(promptTxt);
+  } else {
+    btn.disabled = false; btn.classList.remove("busy");
+    lbl.textContent = "Generate Image";
+    removeLoadCard();
+  }
+}
+
+function addLoadCard(promptTxt) {
+  const grid = document.getElementById("igrid");
+  grid.style.display = "grid";
+  document.getElementById("emptyState").style.display = "none";
+  const card = document.createElement("div");
+  card.className = "lcard"; card.id = "loadCard";
+  const safe = promptTxt.slice(0, 80).replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  card.innerHTML = `
+    <div class="limg">
+      <div class="lspin"></div>
+      <div class="llabel">Generating…</div>
+      <div class="lptext">${safe}${promptTxt.length>80?"…":""}</div>
+    </div>
+    <div class="cmeta"><div class="cprompt" style="color:var(--border)">Processing…</div></div>
+  `;
+  grid.prepend(card);
+  document.getElementById("cscroll").scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function removeLoadCard() {
+  const c = document.getElementById("loadCard");
+  if (c) c.remove();
+}
+
+function updateCount() {
+  document.getElementById("cntBadge").textContent = `${imgCount} image${imgCount!==1?"s":""}`;
+  document.getElementById("clrBtn").classList.toggle("show", imgCount > 0);
+}
+
+function clearAll() {
+  document.getElementById("igrid").innerHTML = "";
+  document.getElementById("igrid").style.display = "none";
+  document.getElementById("emptyState").style.display = "flex";
+  imgCount = 0; updateCount();
+}
+
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+// ── LIGHTBOX ──
+function openLb(src) {
+  document.getElementById("lbImg").src = src;
+  document.getElementById("lb").classList.add("show");
+}
+function closeLb(e) {
+  if (e && e.target !== document.getElementById("lb") && !e.target.classList.contains("lb-close")) return;
+  document.getElementById("lb").classList.remove("show");
+  document.getElementById("lbImg").src = "";
+}
+
+// ── ADD IMAGE CARD ──
+// Store images in a Map to avoid putting huge base64 into HTML attributes
+const imageStore = new Map();
+
+function addImageCard(imgData, promptTxt, ratio, quality) {
+  const grid = document.getElementById("igrid");
+  grid.style.display = "grid";
+  document.getElementById("emptyState").style.display = "none";
+
+  const id = "img_" + Date.now();
+  imageStore.set(id, imgData);
+
+  const now = new Date().toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" });
+  const safePrm = promptTxt.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+  const card = document.createElement("div");
+  card.className = "icard";
+  card.innerHTML = `
+    <img id="${id}" src="" alt="" style="cursor:pointer" onclick="openLb(imageStore.get('${id}'))">
+    <div class="cmeta">
+      <div class="cprompt">${safePrm}</div>
+      <div class="cfoot">
+        <div class="ctags">
+          <span class="tag">${ratio}</span>
+          <span class="tag">${quality}</span>
+          <span class="tag">${now}</span>
+        </div>
+        <div class="cactions">
+          <button class="ibtn" title="Copy prompt" onclick="copyTxt(${JSON.stringify(promptTxt)})">📋</button>
+          <button class="ibtn" title="Reload prompt" onclick="reloadPrm(${JSON.stringify(promptTxt)})">↩</button>
+          <button class="ibtn" title="Download" onclick="dlImg('${id}')">⬇</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  grid.prepend(card);
+
+  // Set src AFTER inserting into DOM — avoids any HTML escaping issues
+  document.getElementById(id).src = imgData;
+
+  imgCount++; updateCount();
+}
+
+function copyTxt(p) { navigator.clipboard.writeText(p).then(() => toast("Prompt copied!")).catch(()=>{}); }
+function reloadPrm(p) { document.getElementById("prompt").value = p; toast("Prompt loaded"); }
+function dlImg(id) {
+  const data = imageStore.get(id);
+  if (!data) return;
+  const a = document.createElement("a");
+  a.href = data;
+  a.download = `seedream-${id}.png`;
+  a.click();
+}
+
+// ── GENERATE ──
+async function generate() {
+  const apiKey = document.getElementById("apiKey").value.trim();
+  const prompt = document.getElementById("prompt").value.trim();
+  const neg    = document.getElementById("neg").value.trim();
+  const quality = document.getElementById("quality").value;
+
+  hideErr();
+  if (!apiKey) { showErr("Please enter your OpenRouter API key."); return; }
+  if (!prompt) { showErr("Please enter a prompt."); return; }
+
+  setLoading(true, prompt);
+
+  // Build message content
+  const fullPrompt = neg ? `${prompt}\n\nNegative prompt: ${neg}` : prompt;
+
+  let messageContent;
+  if (refBase64) {
+    // Multi-part: text first, then image (per OpenRouter docs)
+    messageContent = [
+      { type: "text", text: fullPrompt },
+      { type: "image_url", image_url: { url: refBase64 } }
+    ];
+  } else {
+    messageContent = fullPrompt;
+  }
+
+  const body = {
+    model: "bytedance-seed/seedream-4.5",
+    modalities: ["image"],
+    messages: [{ role: "user", content: messageContent }],
+    image_config: {
+      aspect_ratio: selectedRatio,
+      image_size: quality
+    }
+  };
+
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://claude.ai",
+        "X-Title": "Seedream 4.5 Generator"
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.error?.message || `API error HTTP ${res.status}`);
+    }
+
+    const message = data?.choices?.[0]?.message;
+    let imageUrl = null;
+
+    // PRIMARY: message.images[] — OpenRouter image gen standard
+    if (Array.isArray(message?.images) && message.images.length > 0) {
+      imageUrl = message.images[0]?.image_url?.url;
+    }
+
+    // FALLBACK: content array with image_url parts
+    if (!imageUrl && Array.isArray(message?.content)) {
+      for (const p of message.content) {
+        if (p.type === "image_url" && p.image_url?.url) { imageUrl = p.image_url.url; break; }
+      }
+    }
+
+    // FALLBACK: content as plain data URL string
+    if (!imageUrl && typeof message?.content === "string") {
+      const s = message.content.trim();
+      if (s.startsWith("data:image") || s.startsWith("http")) imageUrl = s;
+    }
+
+    if (!imageUrl) {
+      console.error("Full API response:", JSON.stringify(data, null, 2));
+      throw new Error("No image in response. Check browser console (F12) for the raw response.");
+    }
+
+    setLoading(false);
+    addImageCard(imageUrl, prompt, selectedRatio, quality);
+
+  } catch (err) {
+    setLoading(false);
+    showErr(err.message);
+  }
+}
+
+updateCount();
+</script>
+
+<script type="text/javascript" src="/unprotected/back_to_spaceship.js?hash=4975d460e508829e8fb64d3962bc44ad35f3a95a"></script>
+
+</body>
+</html>
+
